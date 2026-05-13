@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>YouTube SEO Extractor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --red:#E63946;--red-dark:#c1121f;
+  --bg:#080808;--bg2:#111;--bg3:#1a1a1a;--bg4:#222;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#f0f0f0;--muted:#777;--muted2:#444;
+  --green:#4ade80;--blue:#60a5fa;--yellow:#fbbf24;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding-bottom:60px}
+
+/* Header */
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 18px;position:sticky;top:0;z-index:20;backdrop-filter:blur(10px)}
+.hrow{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:11px}
+.logo{width:34px;height:34px;background:var(--red);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo svg{width:18px;height:18px;fill:white}
+.logo-text h1{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px}
+.logo-text p{font-size:11px;color:var(--muted);margin-top:1px}
+
+main{max-width:640px;margin:0 auto;padding:20px 14px 0}
+
+/* Input card */
+.input-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:18px;margin-bottom:14px}
+.input-label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.input-label::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--red)}
+input[type=text]{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+input[type=text]:focus{border-color:var(--red)}
+input::placeholder{color:var(--muted2)}
+
+.options-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.opt-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:7px 14px;font-size:12px;cursor:pointer;color:var(--muted);transition:all .15s;user-select:none}
+.opt-chip input{display:none}
+.opt-chip.checked{background:rgba(230,57,70,.1);border-color:rgba(230,57,70,.4);color:var(--red)}
+.opt-chip .dot{width:7px;height:7px;border-radius:50%;border:1.5px solid currentColor;transition:all .15s;flex-shrink:0}
+.opt-chip.checked .dot{background:var(--red);border-color:var(--red)}
+
+.fetch-btn{width:100%;background:var(--red);border:none;border-radius:14px;padding:15px;color:white;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px}
+.fetch-btn:active{transform:scale(.98);background:var(--red-dark)}
+.fetch-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+.error-box{background:rgba(230,57,70,.1);border:1px solid rgba(230,57,70,.25);border-radius:12px;padding:12px 14px;font-size:13px;color:#fca5a5;margin-bottom:14px;display:none}
+
+/* Thumbnail */
+.thumb{width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:var(--bg3);margin-bottom:14px;display:none}
+.thumb img{width:100%;height:100%;object-fit:cover}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center}
+.stat-box.full{grid-column:1/-1}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.stat-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px}
+.stat-val.sm{font-size:14px;font-weight:600;line-height:1.4}
+
+/* Section label */
+.sec-lbl{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 10px}
+
+/* Data cards */
+.data-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:10px}
+.dc-head{padding:12px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.dc-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;display:flex;align-items:center;gap:7px}
+.dc-title .ico{font-size:15px}
+.copy-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:5px 12px;font-size:11px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.copy-btn:active{color:var(--green);border-color:var(--green)}
+.dc-body{padding:14px}
+.dc-text{font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.dc-body.scroll{max-height:180px;overflow-y:auto}
+.dc-body.scroll::-webkit-scrollbar{width:3px}
+.dc-body.scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+.char-count{font-size:11px;color:var(--muted);margin-top:6px}
+
+/* Tags */
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px}
+.tag{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--text)}
+
+/* Info table */
+.info-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.info-tbl tr{border-bottom:1px solid var(--border)}
+.info-tbl tr:last-child{border-bottom:none}
+.info-tbl td{padding:9px 0}
+.info-tbl td:first-child{color:var(--muted);width:42%}
+.info-tbl td:last-child{color:var(--text);font-weight:500}
+
+/* Transcript */
+.transcript-box{background:var(--bg3);border-radius:10px;padding:12px;max-height:220px;overflow-y:auto;font-size:12px;line-height:1.8;color:#ccc}
+.transcript-box::-webkit-scrollbar{width:3px}
+.transcript-box::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+.ts-time{color:var(--red);font-size:11px;margin-right:6px;font-weight:500}
+
+/* AI Strategy btn */
+.ai-btn{width:100%;background:linear-gradient(135deg,rgba(230,57,70,.15),rgba(230,57,70,.05));border:1px solid rgba(230,57,70,.3);border-radius:14px;padding:15px;color:var(--red);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px}
+.ai-btn:active{background:rgba(230,57,70,.2);transform:scale(.98)}
+
+.export-btn{width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:13px;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px}
+.export-btn:active{color:var(--text);border-color:var(--text)}
+
+/* Loading */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:17px;height:17px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500}
+.badge.green{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.2)}
+.badge.red{background:rgba(230,57,70,.1);color:var(--red);border:1px solid rgba(230,57,70,.2)}
+
+#results{display:none}
+
+/* Upload time highlight */
+.time-highlight{background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:10px 14px;margin-top:8px;display:flex;align-items:center;gap:10px}
+.time-highlight .ico{font-size:20px}
+.time-highlight .info .lbl{font-size:10px;color:var(--yellow);text-transform:uppercase;letter-spacing:.6px}
+.time-highlight .info .val{font-size:15px;font-weight:600;margin-top:2px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hrow">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    </div>
+    <div class="logo-text">
+      <h1>YouTube SEO Extractor</h1>
+      <p>Tags · Upload Time · Transcript · AI Strategy</p>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="input-card" style="margin-top:16px">
+    <div class="input-label">Video URL ya ID</div>
+    <input type="text" id="videoUrl" placeholder="https://youtube.com/watch?v=..." />
+
+    <div class="options-row">
+      <label class="opt-chip checked" id="chip-seo" onclick="toggleChip(this)">
+        <span class="dot"></span> SEO Data
+      </label>
+      <label class="opt-chip checked" id="chip-transcript" onclick="toggleChip(this)">
+        <span class="dot"></span> Transcript / Script
+      </label>
+    </div>
+  </div>
+
+  <div id="errorBox" class="error-box"></div>
+
+  <button class="fetch-btn" id="fetchBtn" onclick="fetchData()">
+    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    Analyze Karo
+  </button>
+
+  <div id="results">
+
+    <div class="thumb" id="thumbWrap">
+      <img id="thumbImg" src="" alt="Thumbnail" />
+    </div>
+
+    <!-- Stats -->
+    <div class="sec-lbl">📊 Stats</div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-lbl">Views</div><div class="stat-val" id="sViews">—</div></div>
+      <div class="stat-box"><div class="stat-lbl">Likes</div><div class="stat-val" id="sLikes">—</div></div>
+      <div class="stat-box full">
+        <div class="stat-lbl">Upload Date & Time</div>
+        <div class="stat-val sm" id="sDateTime">—</div>
+      </div>
+    </div>
+
+    <!-- SEO Data -->
+    <div class="sec-lbl">🔍 SEO Data</div>
+
+    <!-- Title -->
+    <div class="data-card">
+      <div class="dc-head">
+        <div class="dc-title"><span class="ico">🔤</span> Title</div>
+        <button class="copy-btn" onclick="cp('titleVal',this)">Copy</button>
+      </div>
+      <div class="dc-body">
+        <div class="dc-text" id="titleVal"></div>
+        <div class="char-count" id="titleChars"></div>
+      </div>
+    </div>
+
+    <!-- Tags — THE KEY FEATURE -->
+    <div class="data-card">
+      <div class="dc-head">
+        <div class="dc-title"><span class="ico">🏷️</span> Tags <span id="tagCount" style="font-size:10px;color:var(--muted);font-weight:400;margin-left:4px"></span></div>
+        <button class="copy-btn" onclick="cp('tagsRaw',this)">Copy All</button>
+      </div>
+      <div class="dc-body">
+        <p id="tagsRaw" style="display:none"></p>
+        <div class="tags-wrap" id="tagsPills"></div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="data-card">
+      <div class="dc-head">
+        <div class="dc-title"><span class="ico">📄</span> Description</div>
+        <button class="copy-btn" onclick="cp('descVal',this)">Copy</button>
+      </div>
+      <div class="dc-body scroll">
+        <div class="dc-text" id="descVal"></div>
+      </div>
+    </div>
+
+    <!-- Upload Time detail -->
+    <div class="data-card">
+      <div class="dc-head">
+        <div class="dc-title"><span class="ico">⏰</span> Upload Info</div>
+      </div>
+      <div class="dc-body">
+        <table class="info-tbl">
+          <tr><td>Upload Date</td><td id="iDate">—</td></tr>
+          <tr><td>Upload Time</td><td id="iTime">—</td></tr>
+          <tr><td>Channel</td><td id="iChannel">—</td></tr>
+          <tr><td>Duration</td><td id="iDuration">—</td></tr>
+          <tr><td>Category</td><td id="iCategory">—</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Transcript -->
+    <div id="transcriptSection" style="display:none">
+      <div class="sec-lbl">📝 Transcript / Script</div>
+      <div class="data-card">
+        <div class="dc-head">
+          <div class="dc-title"><span class="ico">🎙️</span> Video Script</div>
+          <button class="copy-btn" onclick="cp('transcriptFull',this)">Copy Full</button>
+        </div>
+        <div class="dc-body">
+          <div id="transcriptStats" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"></div>
+          <div class="transcript-box" id="transcriptBox"></div>
+          <p id="transcriptFull" style="display:none"></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="transcriptError" style="display:none" class="error-box"></div>
+
+    <!-- AI Strategy -->
+    <div class="sec-lbl">🤖 AI Strategy</div>
+    <button class="ai-btn" onclick="sendToAI()">
+      ✨ Is data se viral SEO strategy banao
+    </button>
+    <button class="export-btn" onclick="exportTxt()">
+      📋 Poora data export karo (.txt)
+    </button>
+
+  </div>
+</main>
+
+<script>
+let data = {};
+
+function toggleChip(el){
+  el.classList.toggle('checked');
+}
+
+function fmt(n){
+  if(!n)return'0';
+  n=parseInt(n);
+  if(n>=10000000)return(n/10000000).toFixed(1)+' Cr';
+  if(n>=100000)return(n/100000).toFixed(1)+' L';
+  if(n>=1000)return(n/1000).toFixed(1)+'K';
+  return n.toLocaleString('en-IN');
+}
+
+function fmtTime(s){
+  const d=new Date(s*1000);
+  const h=d.getUTCHours(),m=d.getUTCMinutes(),sec=d.getUTCSeconds();
+  return h?`${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`:`${m}:${String(sec).padStart(2,'0')}`;
+}
+
+async function fetchData(){
+  const url=document.getElementById('videoUrl').value.trim();
+  const doTranscript=document.getElementById('chip-transcript').classList.contains('checked');
+  const errBox=document.getElementById('errorBox');
+  errBox.style.display='none';
+  document.getElementById('results').style.display='none';
+
+  if(!url){showErr('YouTube URL daalo pehle');return}
+
+  const btn=document.getElementById('fetchBtn');
+  btn.disabled=true;
+  btn.innerHTML='<div class="spinner"></div> Analyzing...';
+
+  try{
+    const res=await fetch('/api/analyze',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url,transcript:doTranscript})
+    });
+    const result=await res.json();
+    if(result.error){showErr(result.error);return}
+
+    data=result.seo;
+
+    // Thumbnail
+    const tw=document.getElementById('thumbWrap');
+    const ti=document.getElementById('thumbImg');
+    ti.src=data.thumbnail;
+    ti.onerror=()=>{ti.src=`https://img.youtube.com/vi/${data.video_id}/hqdefault.jpg`};
+    tw.style.display='block';
+
+    // Stats
+    document.getElementById('sViews').textContent=fmt(data.views);
+    document.getElementById('sLikes').textContent=data.likes||'—';
+    const dtStr=[data.upload_date,data.upload_time].filter(Boolean).join(' · ')||'—';
+    document.getElementById('sDateTime').textContent=dtStr;
+
+    // Title
+    document.getElementById('titleVal').textContent=data.title||'(nahi mila)';
+    document.getElementById('titleChars').textContent=`${(data.title||'').length} characters`;
+
+    // Tags
+    const tags=data.tags||[];
+    document.getElementById('tagsRaw').textContent=tags.join(', ');
+    document.getElementById('tagCount').textContent=`(${tags.length})`;
+    const pills=document.getElementById('tagsPills');
+    pills.innerHTML=tags.length
+      ?tags.map(t=>`<div class="tag">${t}</div>`).join('')
+      :'<span style="color:var(--muted);font-size:13px;">Tags nahi mile — ho sakta hai creator ne nahi daale</span>';
+
+    // Description
+    document.getElementById('descVal').textContent=data.description||'(Description nahi hai)';
+
+    // Upload info
+    document.getElementById('iDate').textContent=data.upload_date||'—';
+    document.getElementById('iTime').textContent=data.upload_time||data.upload_datetime_raw||'—';
+    document.getElementById('iChannel').textContent=data.channel||'—';
+    document.getElementById('iDuration').textContent=data.duration||'—';
+    document.getElementById('iCategory').textContent=data.category||'—';
+
+    // Transcript
+    const tsSection=document.getElementById('transcriptSection');
+    const tsErr=document.getElementById('transcriptError');
+    tsSection.style.display='none';
+    tsErr.style.display='none';
+
+    if(doTranscript){
+      if(result.transcript){
+        const ts=result.transcript;
+        document.getElementById('transcriptStats').innerHTML=
+          `<span class="badge green">📝 ${ts.word_count} words</span><span class="badge green">🎯 ${ts.segment_count} segments</span>`;
+        const box=document.getElementById('transcriptBox');
+        box.innerHTML=ts.segments.map(s=>`<span class="ts-time">${fmtTime(s.start)}</span>${s.text}<br>`).join('');
+        document.getElementById('transcriptFull').textContent=ts.full_text;
+        tsSection.style.display='block';
+      } else if(result.transcript_error){
+        tsErr.textContent='⚠️ '+result.transcript_error;
+        tsErr.style.display='block';
+      }
+    }
+
+    document.getElementById('results').style.display='block';
+    setTimeout(()=>document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'}),100);
+
+  }catch(e){
+    showErr('Server se connect nahi ho paya. Thodi der baad try karo.');
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Analyze Karo';
+  }
+}
+
+function showErr(msg){
+  const e=document.getElementById('errorBox');
+  e.textContent='⚠️ '+msg;
+  e.style.display='block';
+  document.getElementById('fetchBtn').disabled=false;
+  document.getElementById('fetchBtn').innerHTML='<svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Analyze Karo';
+}
+
+function cp(id,btn){
+  const txt=document.getElementById(id).textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const orig=btn.textContent;
+    btn.textContent='✓';
+    btn.style.color='var(--green)';
+    btn.style.borderColor='var(--green)';
+    setTimeout(()=>{btn.textContent=orig;btn.style.color='';btn.style.borderColor='';},1500);
+  }).catch(()=>{
+    const r=document.createRange();
+    r.selectNode(document.getElementById(id));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(r);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+  });
+}
+
+function sendToAI(){
+  const d=data;
+  const ts=document.getElementById('transcriptFull').textContent;
+  const msg=`Maine YouTube competitor ki video ka yeh poora data nikala hai. Isko analyze karke mujhe ek VIRAL SEO strategy do:\n\n🎬 TITLE: ${d.title}\n\n📅 UPLOAD: ${d.upload_date} ${d.upload_time||''}\n\n📊 STATS: ${fmt(d.views)} views | ${d.likes||'?'} likes\n\n🏷️ TAGS (${(d.tags||[]).length}): ${(d.tags||[]).join(', ')}\n\n📄 DESCRIPTION:\n${(d.description||'').slice(0,600)}\n\n${ts?'📝 TRANSCRIPT (excerpt):\n'+ts.slice(0,500):'(Transcript available nahi)'}\n\nMujhe chahiye:\n1. Is video ki SEO strategy ka deep analysis (keywords, title structure, tags pattern)\n2. Is topic pe meri video ke liye:\n   ✅ Ek clickbait + keyword-rich TITLE (60-70 chars)\n   ✅ Full DESCRIPTION (hashtags + keywords + CTA ke saath, 300+ words)\n   ✅ 20-25 high-volume TAGS (comma separated)\n   ✅ Best upload TIME recommendation (kab upload karoon)\n   ✅ Thumbnail idea\n3. Kaunse keywords target karoon jo crores views la sake`;
+  if(window.parent!==window){
+    window.parent.postMessage({type:'sendPrompt',text:msg},'*');
+  }else{
+    navigator.clipboard.writeText(msg).then(()=>alert('AI prompt copy ho gaya! Claude mein paste karo.')).catch(()=>alert('Copy nahi hua, manually copy karo.'));
+  }
+}
+
+function exportTxt(){
+  const d=data;
+  const ts=document.getElementById('transcriptFull').textContent;
+  const txt=`==============================\nYOUTUBE SEO DATA EXPORT\nDate: ${new Date().toLocaleString('hi-IN')}\nVideo: https://youtube.com/watch?v=${d.video_id}\n==============================\n\n📊 STATS\nViews: ${d.views}\nLikes: ${d.likes||'N/A'}\nUpload Date: ${d.upload_date||'N/A'}\nUpload Time: ${d.upload_time||'N/A'}\n\n🔤 TITLE\n${d.title}\n\n🏷️ TAGS (${(d.tags||[]).length})\n${(d.tags||[]).join('\n')}\n\n📄 DESCRIPTION\n${d.description||'N/A'}\n\nℹ️ INFO\nChannel: ${d.channel||'N/A'}\nDuration: ${d.duration||'N/A'}\nCategory: ${d.category||'N/A'}\n\n${ts?'📝 FULL TRANSCRIPT\n'+ts:''}`;
+  const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`yt-seo-${d.video_id}.txt`;a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById('videoUrl').addEventListener('keydown',e=>{
+  if(e.key==='Enter')fetchData();
+});
+</script>
+</body>
+</html>
