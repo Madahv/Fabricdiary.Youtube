@@ -1,0 +1,81 @@
+# YouTube SEO Extractor — Render pe Free Host karna
+
+## Kya milega:
+✅ Tags (jo normally nahi dikhte)
+✅ Exact Upload Date & Time
+✅ Title, Description
+✅ Video Transcript/Script
+✅ AI se viral SEO strategy
+✅ Mobile pe perfectly kaam karta hai
+✅ Bilkul FREE
+
+---
+
+## Step 1: GitHub Account banao (agar nahi hai)
+1. github.com pe jao
+2. Sign up karo (free)
+
+---
+
+## Step 2: Code GitHub pe daalo
+
+### Option A: GitHub Desktop (Easy, Recommended for beginners)
+1. desktop.github.com se GitHub Desktop download karo
+2. "New Repository" → Name: yt-seo-tool
+3. Is folder ki saari files wahan copy karo
+4. "Commit to main" → "Publish Repository"
+
+### Option B: Direct GitHub Upload
+1. github.com → New Repository → Name: yt-seo-tool → Create
+2. "Upload files" click karo
+3. Ye saari files drag & drop karo:
+   - app.py
+   - requirements.txt
+   - render.yaml
+   - Procfile
+   - templates/ folder (index.html ke saath)
+4. "Commit changes" click karo
+
+---
+
+## Step 3: Render pe Deploy karo (FREE)
+
+1. render.com pe jao → Sign Up (GitHub se login karo)
+2. "New +" → "Web Service"
+3. Apna GitHub repo select karo (yt-seo-tool)
+4. Settings:
+   - Name: yt-seo-extractor (ya kuch bhi)
+   - Environment: Python 3
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `gunicorn app:app`
+   - Plan: **Free**
+5. "Create Web Service" click karo
+6. 2-3 minute wait karo — deploy ho jayega!
+
+---
+
+## Step 4: Apni website ka URL milega
+render.com aapko ek URL dega jaise:
+`https://yt-seo-extractor.onrender.com`
+
+YE URL phone mein bookmark kar lo — bas isko kholo aur kaam shuru!
+
+---
+
+## Important Notes:
+- Render free plan mein 15 min baad "sleep" ho jata hai
+- Pehli baar open karne pe 30-60 sec lag sakte hain (wakeup time)
+- Baad mein normal speed pe aata hai
+- Koi API key nahi chahiye — seedha YouTube se data nikalega
+
+---
+
+## Transcript ke baare mein:
+- Transcript tabhi milegi jab creator ne captions enable kiye hoon
+- Auto-generated captions bhi kaam karti hain
+- Hindi/English dono supported
+
+---
+
+## Problems ho toh:
+Koi bhi error aaye toh Claude ko screenshot dikhao, fix kar denge!
